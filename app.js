@@ -149,3 +149,61 @@ document.querySelector('#saveMetrics').onclick=()=>{document.querySelectorAll('[
 document.querySelector('#saveSettings').onclick=()=>{state.settings.name=document.querySelector('#nameInput').value||'Arthur';state.settings.weeklyTarget=+document.querySelector('#weeklyTarget').value;state.settings.week=Math.max(1,Math.min(16,+document.querySelector('#weekInput').value||1));state.settings.phase=phaseForWeek(state.settings.week);save();renderToday();renderPlan();renderProgress();renderSettings();alert('Ajustes salvos.')};
 document.querySelector('#clearData').onclick=()=>{if(confirm('Apagar todos os dados deste navegador?')){localStorage.removeItem(storeKey);state=structuredClone(defaultState);location.reload()}};
 renderToday();renderProgress();renderSettings();
+
+
+/* ===== v3 DRAGGABLE WEEK CALENDAR ===== */
+state.schedule = state.schedule || {};
+state.weekOffset = state.weekOffset || 0;
+function calISO(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),x=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${x}`}
+function calMonday(){const d=new Date(),w=d.getDay();d.setDate(d.getDate()+(w===0?-6:1-w));d.setHours(0,0,0,0);return d}
+function calDates(){const m=calMonday();m.setDate(m.getDate()+state.weekOffset*7);return Array.from({length:7},(_,i)=>{const d=new Date(m);d.setDate(d.getDate()+i);return d})}
+function seedWeek(ds){
+ const defaults=['force','toss','speed','cheer','recovery','cheer','cheer'];
+ ds.forEach((d,i)=>{const k=calISO(d);if(!(k in state.schedule))state.schedule[k]=[defaults[i]]});
+ save();
+}
+let pickedCard=null;
+function moveCal(from,to,type){
+ state.schedule[from]=(state.schedule[from]||[]).filter(x=>x!==type);
+ state.schedule[to]=state.schedule[to]||[];
+ if(!state.schedule[to].includes(type))state.schedule[to].push(type);
+ if(to===calISO(new Date()) && ['force','toss','speed','armor','recovery','cheer'].includes(type)) setSession(type);
+ save();renderCalendar();
+}
+function renderCalendar(){
+ const ds=calDates();seedWeek(ds);
+ const strip=document.querySelector('#weekStrip');if(!strip)return;strip.innerHTML='';
+ const fmt=d=>d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+ document.querySelector('#agendaRange').textContent=`${fmt(ds[0])} — ${fmt(ds[6])}`;
+ const labels=['SEG','TER','QUA','QUI','SEX','SÁB','DOM'];
+ ds.forEach((d,i)=>{
+   const k=calISO(d),box=document.createElement('div');box.className='agenda-day'+(k===calISO(new Date())?' today':'');
+   box.innerHTML=`<div class="agenda-head">${labels[i]}<b>${d.getDate()}</b></div><div class="agenda-items"></div>`;
+   const items=box.querySelector('.agenda-items'),arr=state.schedule[k]||[];
+   if(!arr.length)items.innerHTML='<div class="empty-slot">Solte aqui</div>';
+   arr.forEach(type=>{
+     const c=document.createElement('div');c.className=`agenda-card ${type}`;c.draggable=true;
+     c.innerHTML=`${names[type]||type}<small>${descriptions[type]||''}</small>`;
+     c.ondragstart=e=>e.dataTransfer.setData('text/plain',JSON.stringify({from:k,type}));
+     c.onclick=e=>{e.stopPropagation();document.querySelectorAll('.agenda-card').forEach(x=>x.style.outline='');pickedCard={from:k,type};c.style.outline='2px solid white'};
+     items.appendChild(c);
+   });
+   box.ondragover=e=>{e.preventDefault();box.classList.add('drop')};
+   box.ondragleave=()=>box.classList.remove('drop');
+   box.ondrop=e=>{e.preventDefault();box.classList.remove('drop');try{const x=JSON.parse(e.dataTransfer.getData('text/plain'));moveCal(x.from,k,x.type)}catch(_){}};
+   box.onclick=()=>{if(pickedCard){moveCal(pickedCard.from,k,pickedCard.type);pickedCard=null;document.querySelectorAll('.agenda-card').forEach(x=>x.style.outline='')}};
+   strip.appendChild(box);
+ });
+}
+document.querySelector('#prevWeek').onclick=()=>{state.weekOffset--;save();renderCalendar()};
+document.querySelector('#nextWeek').onclick=()=>{state.weekOffset++;save();renderCalendar()};
+
+/* Calendar is the source of today's session. */
+const todayKey=calISO(new Date()), currentWeek=calDates();seedWeek(currentWeek);
+const scheduled=(state.schedule[todayKey]||[]).find(x=>x!=='recovery') || (state.schedule[todayKey]||[])[0];
+if(scheduled && !todayData().session){todayData().session=scheduled;save();}
+renderCalendar();renderToday();
+
+/* Make phase/week impossible to appear blank. */
+const quickWeek=document.querySelector('#quickWeek');
+if(quickWeek){quickWeek.value=state.settings.week||1;quickWeek.onchange=e=>{state.settings.week=Math.max(1,Math.min(16,+e.target.value||1));state.settings.phase=phaseForWeek(state.settings.week);save();renderToday();renderPlan();renderProgress();renderSettings()}}

@@ -1,6 +1,6 @@
 {
-  "name": "Arthur Cheer Performance FLEX",
-  "short_name": "Cheer FLEX",
+  "name": "Arthur Cheer Performance Calendar v3",
+  "short_name": "Cheer Calendar",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#080a0f",
