@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b0d12" />
-  <title>Spider Performance</title>
+  <title>Arthur Cheer Performance</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,8 +12,8 @@
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">PROJETO HOMEM-ARANHA</p>
-        <h1>Spider Performance</h1>
+        <p class="eyebrow">ARTHUR CHEER PERFORMANCE • 16 SEMANAS</p>
+        <h1>Cheer Performance</h1>
       </div>
       <div class="level-pill" id="levelPill">Fase 1</div>
     </header>
@@ -51,6 +51,8 @@
           <div id="workoutList" class="workout-list"></div>
         </section>
 
+        <section class="panel compact-panel"><div class="panel-head"><div><p class="eyebrow">CHEER TRANSFER</p><h3>Toss Quality Score</h3></div><strong id="tossTotal">0/25</strong></div><p class="muted">Após o cheer, nota 1–5 para medir transferência real.</p><div class="metric-form"><label>Altura<input id="toss_height" type="number" min="1" max="5"></label><label>Verticalidade<input id="toss_vertical" type="number" min="1" max="5"></label><label>Timing pernas/braços<input id="toss_timing" type="number" min="1" max="5"></label><label>Tripla extensão<input id="toss_extension" type="number" min="1" max="5"></label><label>Catch/controle<input id="toss_control" type="number" min="1" max="5"></label></div><button class="primary full" id="saveToss">Salvar Toss Score</button></section>
+
         <section class="panel compact-panel">
           <div class="panel-head"><div><p class="eyebrow">CHECK-IN</p><h3>Finalizar treino</h3></div></div>
           <label class="field">Observação
@@ -71,18 +73,13 @@
           <div class="stat"><span>Treinos</span><strong id="statSessions">0</strong></div>
           <div class="stat"><span>Sequência</span><strong id="statStreak">0</strong></div>
           <div class="stat"><span>Conclusão</span><strong id="statCompletion">0%</strong></div>
-          <div class="stat"><span>Fase</span><strong id="statPhase">1</strong></div>
+          <div class="stat"><span>Semana</span><strong id="statPhase">1</strong></div>
         </div>
 
         <section class="panel">
           <div class="panel-head"><div><p class="eyebrow">MARCAS</p><h3>Performance</h3></div></div>
           <div class="metric-form">
-            <label>Barra fixa máx.<input data-metric="pullups" type="number" min="0" /></label>
-            <label>Barra + peso (kg)<input data-metric="weightedPullup" type="number" step="0.5" /></label>
-            <label>Agachamento (kg)<input data-metric="squat" type="number" step="0.5" /></label>
-            <label>Terra (kg)<input data-metric="deadlift" type="number" step="0.5" /></label>
-            <label>Dead hang (s)<input data-metric="deadHang" type="number" min="0" /></label>
-            <label>5 km<input data-metric="run5k" type="text" placeholder="24:30" /></label>
+            <label>Back squat e1RM (kg)<input data-metric="squat" type="number" step="0.5" /></label><label>Push press e1RM (kg)<input data-metric="pushPress" type="number" step="0.5" /></label><label>Weighted pull-up +kg<input data-metric="weightedPullup" type="number" step="0.5" /></label><label>Hang power clean (kg)<input data-metric="powerClean" type="number" step="0.5" /></label><label>CMJ (cm)<input data-metric="cmj" type="number" step="0.1" /></label><label>Broad jump (cm)<input data-metric="broadJump" type="number" step="1" /></label>
           </div>
           <button class="primary full" id="saveMetrics">Salvar marcas</button>
         </section>
@@ -97,8 +94,8 @@
         <div class="section-title"><p class="eyebrow">AJUSTES</p><h2>Configuração</h2></div>
         <section class="panel">
           <label class="field">Nome<input id="nameInput" type="text" placeholder="Atleta" /></label>
-          <label class="field">Fase atual<select id="settingsPhase"></select></label>
-          <label class="field">Dias obrigatórios por semana<select id="weeklyTarget"><option value="4">4</option><option value="5">5</option></select></label>
+          <label class="field">Semana atual (1–16)<input id="weekInput" type="number" min="1" max="16" value="1"></label><label class="field">Fase atual<select id="settingsPhase" disabled></select></label>
+          <label class="field">Dias obrigatórios por semana<select id="weeklyTarget"><option value="6">3 academia + 3 cheer</option><option value="5">5 sessões</option><option value="4">4 sessões</option></select></label>
           <button class="primary full" id="saveSettings">Salvar ajustes</button>
         </section>
         <section class="panel danger-zone">
