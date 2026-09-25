@@ -1,9 +1,1 @@
-{
-  "name": "Arthur Cheer Performance Calendar V4",
-  "short_name": "Cheer V4",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#080a0f",
-  "theme_color": "#0b0d12",
-  "icons": []
-}
+{"name": "Arthur Cheer Performance V5", "short_name": "Cheer V5", "start_url": "./index.html", "display": "standalone", "theme_color": "#070b11"}
