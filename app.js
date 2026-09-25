@@ -207,3 +207,17 @@ renderCalendar();renderToday();
 /* Make phase/week impossible to appear blank. */
 const quickWeek=document.querySelector('#quickWeek');
 if(quickWeek){quickWeek.value=state.settings.week||1;quickWeek.onchange=e=>{state.settings.week=Math.max(1,Math.min(16,+e.target.value||1));state.settings.phase=phaseForWeek(state.settings.week);save();renderToday();renderPlan();renderProgress();renderSettings()}}
+
+
+/* V4_CALENDAR_PATCH */
+state.schedule=state.schedule||{};state.weekOffset=state.weekOffset||0;
+function v4iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function v4dates(){let d=new Date(),w=d.getDay();d.setDate(d.getDate()+(w===0?-6:1-w)+(state.weekOffset||0)*7);d.setHours(0,0,0,0);return Array.from({length:7},(_,i)=>{let x=new Date(d);x.setDate(x.getDate()+i);return x})}
+function v4seed(ds){let a=["force","toss","speed","cheer","recovery","cheer","cheer"];ds.forEach((d,i)=>{let k=v4iso(d);if(!(k in state.schedule))state.schedule[k]=[a[i]]});save()}
+let v4picked=null;
+function v4move(from,to,type){state.schedule[from]=(state.schedule[from]||[]).filter(x=>x!==type);state.schedule[to]=state.schedule[to]||[];if(!state.schedule[to].includes(type))state.schedule[to].push(type);if(to===v4iso(new Date())){todayData().session=type;todayData().done=[]}v4picked=null;save();v4render();renderToday()}
+function v4render(){let ds=v4dates();v4seed(ds);let root=document.querySelector("#weekStrip");if(!root)return;root.innerHTML="";let labs=["SEG","TER","QUA","QUI","SEX","SÁB","DOM"];document.querySelector("#agendaRange").textContent=ds[0].toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" — "+ds[6].toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+ds.forEach((d,i)=>{let k=v4iso(d),box=document.createElement("div");box.className="agenda-day"+(k===v4iso(new Date())?" today":"");box.innerHTML=`<div class="agenda-head">${labs[i]}<b>${d.getDate()}</b></div><div class="v4items"></div>`;let items=box.querySelector(".v4items"),arr=state.schedule[k]||[];if(!arr.length)items.innerHTML='<div class="empty-slot">Solte aqui</div>';arr.forEach(type=>{let c=document.createElement("div");c.className="agenda-card "+type;c.draggable=true;c.innerHTML=(names[type]||type)+`<small>${descriptions[type]||""}</small>`;c.ondragstart=e=>e.dataTransfer.setData("text/plain",JSON.stringify({from:k,type}));c.onclick=e=>{e.stopPropagation();document.querySelectorAll(".agenda-card").forEach(x=>x.style.outline="");v4picked={from:k,type};c.style.outline="2px solid white";};items.appendChild(c)});box.ondragover=e=>{e.preventDefault();box.classList.add("drop")};box.ondragleave=()=>box.classList.remove("drop");box.ondrop=e=>{e.preventDefault();box.classList.remove("drop");try{let x=JSON.parse(e.dataTransfer.getData("text/plain"));v4move(x.from,k,x.type)}catch(_){}};box.onclick=()=>{if(v4picked)v4move(v4picked.from,k,v4picked.type)};root.appendChild(box)})}
+document.querySelector("#prevWeek").onclick=()=>{state.weekOffset--;save();v4render()};
+document.querySelector("#nextWeek").onclick=()=>{state.weekOffset++;save();v4render()};
+let v4today=v4iso(new Date());v4seed(v4dates());let v4s=(state.schedule[v4today]||[])[0];if(v4s&&!todayData().session){todayData().session=v4s;save();renderToday()}v4render();

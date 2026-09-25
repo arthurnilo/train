@@ -12,13 +12,17 @@
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">ARTHUR CHEER PERFORMANCE • 16 SEMANAS</p>
+        <p class="eyebrow">ARTHUR CHEER PERFORMANCE • CALENDAR V4</p>
         <h1>Cheer Performance</h1>
       </div>
       <div class="level-pill" id="levelPill">Fase 1</div>
     </header>
 
-    <main>
+    <main><section class="panel week-agenda-panel">
+    <div class="panel-head"><div><p class="eyebrow">AGENDA DA SEMANA</p><h3 id="agendaRange">Esta semana</h3></div>
+    <div><button class="ghost" id="prevWeek">‹</button><button class="ghost" id="nextWeek">›</button></div></div>
+    <p class="muted">Arraste no computador. No celular: toque no treino e depois no dia de destino.</p>
+    <div class="week-strip" id="weekStrip"></div></section>
       <section class="view active" id="todayView">
         <div class="hero-card">
           <div>
